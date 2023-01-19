@@ -1,7 +1,69 @@
+const numStars = 1000;
+let stars = [];
+
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+    createCanvas(windowWidth, windowHeight);
+    strokeWeight(5);
+    for (let i = 0; i < numStars; i++) {
+        stars.push(new Star(random(width), random(height)));
+    }
 }
 
 function draw() {
-  circle(mouseX, mouseY, 20);
+    background('rgba(30,42,52,0.1)');
+
+    const acc = map(mouseX, 0, width, 0.0005, 0.2);
+
+    stars = stars.filter(star => {
+        star.draw();
+        star.update(acc);
+        return star.isActive();
+    });
+
+    while (stars.length < numStars) {
+        stars.push(new Star(random(width), random(height)));
+    }
+
+}
+
+class Star {
+    constructor(x, y) {
+
+        this.red = random(80, 97);
+        this.green = random(124, 250);
+        this.blue = random(10, 200);
+        this.pos = createVector(x, y);
+        this.prevPos = createVector(x, y);
+        this.vel = createVector(0, random(-11, -13));
+
+
+    }
+
+    isActive() {
+        return onScreen(this.prevPos.x, this.prevPos.y);
+    }
+
+    update(acc) {
+        //codigo original
+        // this.vel.x += cos(this.ang) * acc;
+        //this.vel.y += sin(this.ang) * acc;
+        //this.prevPos.x = this.pos.x;
+        this.prevPos.y = this.pos.y;
+
+        //  this.pos.x += this.vel.x;
+        this.pos.y += this.vel.y;
+    }
+
+    draw() {
+        const alpha = map(this.vel.mag(), 0, 3, 0, 255);
+        // stroke(255, alpha);
+        stroke(this.red, this.blue, this.green, alpha);
+        line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
+
+    }
+
+}
+
+function onScreen(x, y) {
+    return x >= 0 && x <= width && y >= 0 && y <= height;
 }
