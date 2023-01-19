@@ -1,18 +1,32 @@
 const numStars = 1000;
 let stars = [];
+let song;
+
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    strokeWeight(5);
+    strokeWeight(3);
     for (let i = 0; i < numStars; i++) {
         stars.push(new Star(random(width), random(height)));
     }
+    song = loadSound('Cherry.mp3');
+
 }
 
+function mousePressed() {
+    if (song.isPlaying()) {
+        song.stop();
+
+    }
+    else {
+        song.play();
+
+    }
+}
 function draw() {
     background('rgba(30,42,52,0.1)');
 
-    const acc = map(mouseX, 0, width, 0.0005, 0.2);
+    const acc = map(mouseX, 40, width, 0.0005, 0.5);
 
     stars = stars.filter(star => {
         star.draw();
@@ -29,12 +43,12 @@ function draw() {
 class Star {
     constructor(x, y) {
 
-        this.red = random(80, 97);
-        this.green = random(124, 250);
-        this.blue = random(10, 200);
+        this.red = random(80, 160);
+        this.green = random(110, 255);
+        this.blue = random(5, 120);
         this.pos = createVector(x, y);
         this.prevPos = createVector(x, y);
-        this.vel = createVector(0, random(-11, -13));
+        this.vel = createVector(0, random(-10, -13));
 
 
     }
@@ -44,19 +58,12 @@ class Star {
     }
 
     update(acc) {
-        //codigo original
-        // this.vel.x += cos(this.ang) * acc;
-        //this.vel.y += sin(this.ang) * acc;
-        //this.prevPos.x = this.pos.x;
         this.prevPos.y = this.pos.y;
-
-        //  this.pos.x += this.vel.x;
         this.pos.y += this.vel.y;
     }
 
     draw() {
         const alpha = map(this.vel.mag(), 0, 3, 0, 255);
-        // stroke(255, alpha);
         stroke(this.red, this.blue, this.green, alpha);
         line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
 
