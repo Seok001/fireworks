@@ -2,7 +2,6 @@ const numStars = 1000;
 let stars = [];
 let song;
 
-
 function setup() {
     createCanvas(windowWidth, windowHeight);
     strokeWeight(3);
@@ -40,15 +39,18 @@ function draw() {
 
 }
 
+
 class Star {
     constructor(x, y) {
 
+        this.particles = [];
         this.red = random(80, 160);
         this.green = random(110, 255);
         this.blue = random(5, 120);
+
         this.pos = createVector(x, y);
         this.prevPos = createVector(x, y);
-        this.vel = createVector(0, random(-10, -13));
+        this.vel = createVector(0, random(-11, -13));
 
 
     }
@@ -60,7 +62,9 @@ class Star {
     update(acc) {
         this.prevPos.y = this.pos.y;
         this.pos.y += this.vel.y;
+
     }
+
 
     draw() {
         const alpha = map(this.vel.mag(), 0, 3, 0, 255);
@@ -69,8 +73,10 @@ class Star {
 
     }
 
+
 }
 
 function onScreen(x, y) {
     return x >= 0 && x <= width && y >= 0 && y <= height;
 }
+
