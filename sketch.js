@@ -1,18 +1,16 @@
-const numStars = 1000;
+const numStars = 100;
 let stars = [];
-let song;
+let llueve = true;
+var song;
+var button;
+var w;
 
-function setup() {
-    createCanvas(windowWidth, windowHeight);
-    strokeWeight(3);
-    for (let i = 0; i < numStars; i++) {
-        stars.push(new Star(random(width), random(height)));
-    }
-    song = loadSound('Cherry.mp3');
 
-}
 
-function mousePressed() {
+function toggleSong() {
+
+    llueve = !llueve;
+
     if (song.isPlaying()) {
         song.stop();
 
@@ -22,23 +20,43 @@ function mousePressed() {
 
     }
 }
-function draw() {
-    background('rgba(30,42,52,0.1)');
 
-    const acc = map(mouseX, 40, width, 0.0005, 0.5);
+function preload() {
+    song = loadSound('Cherry.mp3');
+}
 
-    stars = stars.filter(star => {
-        star.draw();
-        star.update(acc);
-        return star.isActive();
-    });
+function setup() {
+    createCanvas(windowWidth, windowHeight);
+    strokeWeight(3);
+    button = createButton('toggle');
+    button.mouseClicked(toggleSong);
+    song.play();
+    fft = new p5.FFT(0, 256);
+    w = width / 256;
 
-    while (stars.length < numStars) {
-        stars.push(new Star(random(width), random(height)));
-    }
+
 
 }
 
+
+function draw() {
+
+    background('rgba(30,42,52,0.1)');
+
+
+    if (llueve) {
+        stars = stars.filter(function (star) {
+            star.draw();
+            star.update();
+            return star.isActive();
+        });
+        while (stars.length < numStars) {
+            stars.push(new Star(random(width), random(height)));
+        }
+    }
+
+
+}
 
 class Star {
     constructor(x, y) {
@@ -47,10 +65,10 @@ class Star {
         this.red = random(80, 160);
         this.green = random(110, 255);
         this.blue = random(5, 120);
-
         this.pos = createVector(x, y);
         this.prevPos = createVector(x, y);
-        this.vel = createVector(0, random(-11, -13));
+        this.vel = createVector(0, (random(-11, -13)));
+
 
 
     }
@@ -59,17 +77,26 @@ class Star {
         return onScreen(this.prevPos.x, this.prevPos.y);
     }
 
-    update(acc) {
-        this.prevPos.y = this.pos.y;
-        this.pos.y += this.vel.y;
+    update() {
 
+        this.prevPos.x = this.pos.x;
+        this.prevPos.y = this.pos.y;
+
+        this.pos.x += this.vel.x;
+        this.pos.y += this.vel.y;
     }
 
-
     draw() {
-        const alpha = map(this.vel.mag(), 0, 3, 0, 255);
-        stroke(this.red, this.blue, this.green, alpha);
-        line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
+        var spectrum = fft.analyze();
+
+        for (let i = 0; i < spectrum.length; i++) {
+            var amp = spectrum[i];
+            var y = map(amp, 0, 256, height, 0);
+            stroke(this.red, this.blue, this.green,);
+            //line(i * w, height, i * w, y);
+            line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
+        }
+
 
     }
 
@@ -79,4 +106,3 @@ class Star {
 function onScreen(x, y) {
     return x >= 0 && x <= width && y >= 0 && y <= height;
 }
-
