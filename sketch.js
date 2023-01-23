@@ -22,7 +22,7 @@ function toggleSong() {
 }
 
 function preload() {
-    song = loadSound('Cherry.mp3');
+    song = loadSound('Want You Back.mp3');
 }
 
 function setup() {
@@ -61,7 +61,6 @@ function draw() {
 class Star {
     constructor(x, y) {
 
-        this.particles = [];
         this.red = random(80, 160);
         this.green = random(110, 255);
         this.blue = random(5, 120);
@@ -87,14 +86,17 @@ class Star {
     }
 
     draw() {
+
         var spectrum = fft.analyze();
 
         for (let i = 0; i < spectrum.length; i++) {
             var amp = spectrum[i];
             var y = map(amp, 0, 256, height, 0);
+
             stroke(this.red, this.blue, this.green,);
-            //line(i * w, height, i * w, y);
-            line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
+            line(i * w, height, i * w, y);
+
+            line(this.pos.x * (i * w), this.pos.y * (height), this.prevPos.x * (i * w), this.prevPos.y * (y));
         }
 
 
