@@ -1,110 +1,69 @@
-const numStars = 100;
-let stars = [];
+
 let llueve = true;
 var song;
-var button;
+
 var w;
 
 
+function togglePlay() {
 
-function toggleSong() {
-
-    llueve = !llueve;
 
     if (song.isPlaying()) {
-        song.stop();
-
-    }
-    else {
-        song.play();
-
+        song.pause();
+        song.setVolume(0.5);
+    } else {
+        song.loop();
     }
 }
 
+
+
 function preload() {
-    song = loadSound('Want You Back.mp3');
+    song = loadSound('eve.mp3');
 }
 
 function setup() {
-    createCanvas(windowWidth, windowHeight);
-    strokeWeight(3);
-    button = createButton('toggle');
-    button.mouseClicked(toggleSong);
-    song.play();
-    fft = new p5.FFT(0, 256);
+    let cnv = createCanvas(windowWidth, windowHeight);
+    cnv.mouseClicked(togglePlay);
+
+    fft = new p5.FFT(0.9, 256);
     w = width / 256;
+
+    amp = new p5.Amplitude();
 
 
 
 }
-
 
 function draw() {
 
-    background('rgba(30,42,52,0.1)');
+    background('rgba(5,22,33,0.1)');
 
 
-    if (llueve) {
-        stars = stars.filter(function (star) {
-            star.draw();
-            star.update();
-            return star.isActive();
-        });
-        while (stars.length < numStars) {
-            stars.push(new Star(random(width), random(height)));
-        }
+    let waveform = fft.waveform();
+    noFill();
+    beginShape();
+    strokeWeight(4);
+    stroke(red(random(0, 243)), green(random(100, 159)), blue(random(0, 70)));
+    for (let i = 0; i < waveform.length; i++) {
+        let x = map(i, 0, waveform.length, 0, width);
+        let y = map(waveform[i], -1, 1, 0, height);
+        line(x * w, y, x * w, y);
     }
+    endShape();
+
+    var vol = amp.getLevel();
+    var diam = map(vol, 0, 0.5, 20, 200);
+    strokeWeight(5);
+    stroke(red(random(0, 255)), green(random(100, 159)), blue(random(0, 70)));
+    fill(red(random(0, 255)), green(random(100, 159)), blue(random(0, 70)));
+    ellipse(width / 2, height / 2, diam, diam);
+
+    strokeWeight(2);
+    noFill();
+    ellipse(width / 2, height / 2, diam * w, diam * w);
 
 
-}
-
-class Star {
-    constructor(x, y) {
-
-        this.red = random(80, 160);
-        this.green = random(110, 255);
-        this.blue = random(5, 120);
-        this.pos = createVector(x, y);
-        this.prevPos = createVector(x, y);
-        this.vel = createVector(0, (random(-11, -13)));
 
 
-
-    }
-
-    isActive() {
-        return onScreen(this.prevPos.x, this.prevPos.y);
-    }
-
-    update() {
-
-        this.prevPos.x = this.pos.x;
-        this.prevPos.y = this.pos.y;
-
-        this.pos.x += this.vel.x;
-        this.pos.y += this.vel.y;
-    }
-
-    draw() {
-
-        var spectrum = fft.analyze();
-
-        for (let i = 0; i < spectrum.length; i++) {
-            var amp = spectrum[i];
-            var y = map(amp, 0, 256, height, 0);
-
-            stroke(this.red, this.blue, this.green,);
-            line(i * w, height, i * w, y);
-
-            line(this.pos.x * (i * w), this.pos.y * (height), this.prevPos.x * (i * w), this.prevPos.y * (y));
-        }
-
-
-    }
-
-
-}
-
-function onScreen(x, y) {
-    return x >= 0 && x <= width && y >= 0 && y <= height;
 }
